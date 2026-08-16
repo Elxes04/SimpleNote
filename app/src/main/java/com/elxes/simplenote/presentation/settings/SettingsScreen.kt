@@ -10,7 +10,6 @@ import androidx.compose.material.icons.filled.BrightnessMedium
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Palette
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -23,11 +22,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 @Composable
 fun SettingsScreen(
     onBack: () -> Unit,
-    viewModel: SettingsViewModel = hiltViewModel()
+    viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val themeMode by viewModel.themeMode.collectAsStateWithLifecycle()
     val dynamicColorEnabled by viewModel.dynamicColorEnabled.collectAsStateWithLifecycle()
-    val compactSearchEnabled by viewModel.compactSearchEnabled.collectAsStateWithLifecycle()
     
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showThemeDialog by remember { mutableStateOf(false) }
@@ -117,18 +115,6 @@ fun SettingsScreen(
                     Switch(
                         checked = dynamicColorEnabled,
                         onCheckedChange = viewModel::setDynamicColorEnabled
-                    )
-                }
-            )
-
-            ListItem(
-                headlineContent = { Text("Compact Search") },
-                supportingContent = { Text("Hide search bar and use a button near FAB") },
-                leadingContent = { Icon(Icons.Default.Search, contentDescription = null) },
-                trailingContent = {
-                    Switch(
-                        checked = compactSearchEnabled,
-                        onCheckedChange = viewModel::setCompactSearchEnabled
                     )
                 }
             )

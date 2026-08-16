@@ -35,7 +35,7 @@ class MainActivity : ComponentActivity() {
 
             SimpleNoteTheme(
                 darkTheme = darkTheme,
-                dynamicColor = dynamicColor
+                dynamicColor = dynamicColor,
             ) {
                 Surface {
                     val navController = rememberNavController()

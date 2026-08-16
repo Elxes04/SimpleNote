@@ -23,7 +23,7 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun NoteEditorScreen(
     onBack: () -> Unit,
-    viewModel: NoteEditorViewModel = hiltViewModel()
+    viewModel: NoteEditorViewModel = hiltViewModel(),
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
 

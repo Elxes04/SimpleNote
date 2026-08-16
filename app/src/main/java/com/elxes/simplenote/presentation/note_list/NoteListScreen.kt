@@ -8,27 +8,23 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.elxes.simplenote.domain.model.Note
-
-import androidx.compose.ui.res.painterResource
 import com.elxes.simplenote.R
+import com.elxes.simplenote.domain.model.Note
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,9 +38,6 @@ fun NoteListScreen(
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
     val selectedNoteIds by viewModel.selectedNoteIds.collectAsStateWithLifecycle()
     val isSelectionMode = selectedNoteIds.isNotEmpty()
-    
-    val compactSearchEnabled by viewModel.compactSearchEnabled.collectAsStateWithLifecycle()
-    val isSearchActive by viewModel.isSearchActive.collectAsStateWithLifecycle()
     
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
@@ -69,122 +62,100 @@ fun NoteListScreen(
                         titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                 )
-            } else if (compactSearchEnabled && isSearchActive) {
-                SearchBar(
-                    query = searchQuery,
-                    onQueryChange = viewModel::onSearchQueryChange,
-                    onSearch = { viewModel.onSearchQueryChange(it) },
-                    active = true,
-                    onActiveChange = { if (!it) viewModel.toggleSearchActive() },
-                    placeholder = { Text("Search...") },
-                    leadingIcon = { 
-                        IconButton(onClick = viewModel::toggleSearchActive) {
-                            Icon(Icons.Default.Close, contentDescription = "Close search")
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RectangleShape // Full screen feel
-                ) {}
             } else {
-                MediumTopAppBar(
-                    title = {
-                        Text(
-                            text = "My Notes",
-                            style = MaterialTheme.typography.headlineLarge,
-                            fontWeight = FontWeight.ExtraBold
+                Column {
+                    MediumTopAppBar(
+                        title = {
+                            Text(
+                                text = "My Notes",
+                                style = MaterialTheme.typography.headlineLarge,
+                                fontWeight = FontWeight.ExtraBold
+                            )
+                        },
+                        actions = {
+                            IconButton(onClick = onSettingsClick) {
+                                Icon(Icons.Default.Settings, contentDescription = "Settings")
+                            }
+                        },
+                        scrollBehavior = scrollBehavior,
+                        colors = TopAppBarDefaults.mediumTopAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            scrolledContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                        ),
+                        windowInsets = WindowInsets.statusBars
+                    )
+                    
+                    SearchBar(
+                        inputField = {
+                            SearchBarDefaults.InputField(
+                                query = searchQuery,
+                                onQueryChange = viewModel::onSearchQueryChange,
+                                onSearch = viewModel::onSearchQueryChange,
+                                expanded = false,
+                                onExpandedChange = {},
+                                placeholder = { Text("Search your thoughts...", style = MaterialTheme.typography.bodyLarge) },
+                                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) }
+                            )
+                        },
+                        expanded = false,
+                        onExpandedChange = {},
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        shape = MaterialTheme.shapes.extraLarge,
+                        colors = SearchBarDefaults.colors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
                         )
-                    },
-                    actions = {
-                        IconButton(onClick = onSettingsClick) {
-                            Icon(Icons.Default.Settings, contentDescription = "Settings")
-                        }
-                    },
-                    scrollBehavior = scrollBehavior,
-                    colors = TopAppBarDefaults.mediumTopAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        scrolledContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-                    ),
-                    windowInsets = WindowInsets.statusBars // Explicitly handle status bar insets
-                )
+                    ) {}
+                }
             }
         },
         floatingActionButton = {
-            if (!isSelectionMode && !isSearchActive) {
-                Column(horizontalAlignment = androidx.compose.ui.Alignment.End) {
-                    if (compactSearchEnabled) {
-                        SmallFloatingActionButton(
-                            onClick = viewModel::toggleSearchActive,
-                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                            shape = MaterialTheme.shapes.large,
-                            modifier = Modifier.padding(bottom = 16.dp)
-                        ) {
-                            Icon(Icons.Default.Search, contentDescription = "Search")
-                        }
-                    }
-                    
-                    LargeFloatingActionButton(
-                        onClick = onAddNoteClick,
-                        shape = MaterialTheme.shapes.extraLarge,
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = "Add Note",
-                            modifier = Modifier.size(FloatingActionButtonDefaults.LargeIconSize)
-                        )
-                    }
+            if (!isSelectionMode) {
+                LargeFloatingActionButton(
+                    onClick = onAddNoteClick,
+                    shape = MaterialTheme.shapes.extraLarge,
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Add Note",
+                        modifier = Modifier.size(FloatingActionButtonDefaults.LargeIconSize)
+                    )
                 }
             }
         }
     ) { paddingValues ->
-        Column(modifier = Modifier.padding(paddingValues)) {
-            if (!isSelectionMode && !compactSearchEnabled) {
-                SearchBar(
-                    query = searchQuery,
-                    onQueryChange = viewModel::onSearchQueryChange,
-                    onSearch = viewModel::onSearchQueryChange,
-                    active = false,
-                    onActiveChange = {},
-                    placeholder = { Text("Search your thoughts...", style = MaterialTheme.typography.bodyLarge) },
-                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    shape = MaterialTheme.shapes.extraLarge,
-                    colors = SearchBarDefaults.colors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                    )
-                ) {}
-            }
-
+        LazyVerticalStaggeredGrid(
+            columns = StaggeredGridCells.Fixed(2),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+            contentPadding = PaddingValues(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalItemSpacing = 12.dp
+        ) {
             if (notes.isEmpty()) {
-                EmptyNotesPlaceholder()
+                item(span = androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan.FullLine) {
+                    EmptyNotesPlaceholder()
+                }
             } else {
-                LazyVerticalStaggeredGrid(
-                    columns = StaggeredGridCells.Fixed(2),
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalItemSpacing = 12.dp
-                ) {
-                    items(notes, key = { it.id }) { note ->
-                        NoteItem(
-                            note = note,
-                            isSelected = selectedNoteIds.contains(note.id),
-                            onClick = {
-                                if (isSelectionMode) {
-                                    viewModel.toggleNoteSelection(note.id)
-                                } else {
-                                    onNoteClick(note.id)
-                                }
-                            },
-                            onLongClick = {
+                items(notes, key = { it.id }) { note ->
+                    NoteItem(
+                        note = note,
+                        isSelected = selectedNoteIds.contains(note.id),
+                        onClick = {
+                            if (isSelectionMode) {
                                 viewModel.toggleNoteSelection(note.id)
+                            } else {
+                                onNoteClick(note.id)
                             }
-                        )
-                    }
+                        },
+                        onLongClick = {
+                            viewModel.toggleNoteSelection(note.id)
+                        }
+                    )
                 }
             }
         }

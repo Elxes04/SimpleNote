@@ -19,7 +19,6 @@ class SettingsViewModel @Inject constructor(
 ) : ViewModel() {
     val themeMode = preferenceRepository.themeMode
     val dynamicColorEnabled = preferenceRepository.dynamicColorEnabled
-    val compactSearchEnabled = preferenceRepository.compactSearchEnabled
 
     fun setThemeMode(mode: ThemeMode) {
         preferenceRepository.setThemeMode(mode)
@@ -27,10 +26,6 @@ class SettingsViewModel @Inject constructor(
 
     fun setDynamicColorEnabled(enabled: Boolean) {
         preferenceRepository.setDynamicColorEnabled(enabled)
-    }
-
-    fun setCompactSearchEnabled(enabled: Boolean) {
-        preferenceRepository.setCompactSearchEnabled(enabled)
     }
 
     fun deleteAllNotes() {

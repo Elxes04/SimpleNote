@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.elxes.simplenote.domain.model.Note
 import com.elxes.simplenote.domain.repository.NoteRepository
-import com.elxes.simplenote.domain.repository.PreferenceRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
@@ -13,8 +12,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NoteListViewModel @Inject constructor(
-    private val repository: NoteRepository,
-    private val preferenceRepository: PreferenceRepository
+    private val repository: NoteRepository
 ) : ViewModel() {
 
     private val _searchQuery = MutableStateFlow("")
@@ -22,11 +20,6 @@ class NoteListViewModel @Inject constructor(
 
     private val _selectedNoteIds = MutableStateFlow<Set<Long>>(emptySet())
     val selectedNoteIds = _selectedNoteIds.asStateFlow()
-
-    val compactSearchEnabled = preferenceRepository.compactSearchEnabled
-
-    private val _isSearchActive = MutableStateFlow(false)
-    val isSearchActive = _isSearchActive.asStateFlow()
 
     @OptIn(FlowPreview::class)
     val notes = _searchQuery
@@ -42,13 +35,6 @@ class NoteListViewModel @Inject constructor(
 
     fun onSearchQueryChange(query: String) {
         _searchQuery.value = query
-    }
-
-    fun toggleSearchActive() {
-        _isSearchActive.update { !it }
-        if (!_isSearchActive.value) {
-            _searchQuery.value = ""
-        }
     }
 
     fun toggleNoteSelection(noteId: Long) {

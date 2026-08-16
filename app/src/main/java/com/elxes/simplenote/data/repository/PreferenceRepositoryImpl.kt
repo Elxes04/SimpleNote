@@ -16,18 +16,11 @@ class PreferenceRepositoryImpl @Inject constructor() : PreferenceRepository {
     private val _dynamicColorEnabled = MutableStateFlow(true)
     override val dynamicColorEnabled: StateFlow<Boolean> = _dynamicColorEnabled.asStateFlow()
 
-    private val _compactSearchEnabled = MutableStateFlow(false)
-    override val compactSearchEnabled: StateFlow<Boolean> = _compactSearchEnabled.asStateFlow()
-
     override fun setThemeMode(mode: ThemeMode) {
         _themeMode.value = mode
     }
 
     override fun setDynamicColorEnabled(enabled: Boolean) {
         _dynamicColorEnabled.value = enabled
-    }
-
-    override fun setCompactSearchEnabled(enabled: Boolean) {
-        _compactSearchEnabled.value = enabled
     }
 }
