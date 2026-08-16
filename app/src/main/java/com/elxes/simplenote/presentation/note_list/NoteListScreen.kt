@@ -63,51 +63,26 @@ fun NoteListScreen(
                     )
                 )
             } else {
-                Column {
-                    MediumTopAppBar(
-                        title = {
-                            Text(
-                                text = "My Notes",
-                                style = MaterialTheme.typography.headlineLarge,
-                                fontWeight = FontWeight.ExtraBold
-                            )
-                        },
-                        actions = {
-                            IconButton(onClick = onSettingsClick) {
-                                Icon(Icons.Default.Settings, contentDescription = "Settings")
-                            }
-                        },
-                        scrollBehavior = scrollBehavior,
-                        colors = TopAppBarDefaults.mediumTopAppBarColors(
-                            containerColor = MaterialTheme.colorScheme.surface,
-                            scrolledContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-                        ),
-                        windowInsets = WindowInsets.statusBars
-                    )
-                    
-                    SearchBar(
-                        inputField = {
-                            SearchBarDefaults.InputField(
-                                query = searchQuery,
-                                onQueryChange = viewModel::onSearchQueryChange,
-                                onSearch = viewModel::onSearchQueryChange,
-                                expanded = false,
-                                onExpandedChange = {},
-                                placeholder = { Text("Search your thoughts...", style = MaterialTheme.typography.bodyLarge) },
-                                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) }
-                            )
-                        },
-                        expanded = false,
-                        onExpandedChange = {},
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
-                        shape = MaterialTheme.shapes.extraLarge,
-                        colors = SearchBarDefaults.colors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                MediumTopAppBar(
+                    title = {
+                        Text(
+                            text = "My Notes",
+                            style = MaterialTheme.typography.headlineLarge,
+                            fontWeight = FontWeight.ExtraBold
                         )
-                    ) {}
-                }
+                    },
+                    actions = {
+                        IconButton(onClick = onSettingsClick) {
+                            Icon(Icons.Default.Settings, contentDescription = "Settings")
+                        }
+                    },
+                    scrollBehavior = scrollBehavior,
+                    colors = TopAppBarDefaults.mediumTopAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        scrolledContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                    ),
+                    windowInsets = WindowInsets.statusBars
+                )
             }
         },
         floatingActionButton = {
@@ -136,6 +111,38 @@ fun NoteListScreen(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalItemSpacing = 12.dp
         ) {
+            if (!isSelectionMode) {
+                item(span = androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan.FullLine) {
+                    SearchBar(
+                        inputField = {
+                            SearchBarDefaults.InputField(
+                                query = searchQuery,
+                                onQueryChange = viewModel::onSearchQueryChange,
+                                onSearch = viewModel::onSearchQueryChange,
+                                expanded = false,
+                                onExpandedChange = {},
+                                placeholder = {
+                                    Text(
+                                        "Search your thoughts...",
+                                        style = MaterialTheme.typography.bodyLarge
+                                    )
+                                },
+                                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) }
+                            )
+                        },
+                        expanded = false,
+                        onExpandedChange = {},
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp),
+                        shape = MaterialTheme.shapes.extraLarge,
+                        colors = SearchBarDefaults.colors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                        )
+                    ) {}
+                }
+            }
+
             if (notes.isEmpty()) {
                 item(span = androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan.FullLine) {
                     EmptyNotesPlaceholder()
@@ -165,14 +172,16 @@ fun NoteListScreen(
 @Composable
 fun EmptyNotesPlaceholder(modifier: Modifier = Modifier) {
     Box(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 64.dp),
         contentAlignment = androidx.compose.ui.Alignment.Center
     ) {
         Column(horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally) {
             androidx.compose.foundation.Image(
                 painter = painterResource(id = R.drawable.app_logo),
                 contentDescription = null,
-                modifier = Modifier.size(200.dp)
+                modifier = Modifier.size(160.dp)
             )
             Spacer(modifier = Modifier.height(24.dp))
             Text(
