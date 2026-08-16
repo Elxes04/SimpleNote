@@ -1,6 +1,10 @@
 package com.elxes.simplenote.di
 
 import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.room.Room
 import com.elxes.simplenote.data.local.NoteDatabase
 import com.elxes.simplenote.data.local.dao.NoteDao
@@ -45,7 +49,15 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providePreferenceRepository(): PreferenceRepository {
-        return PreferenceRepositoryImpl()
+    fun provideDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
+        return PreferenceDataStoreFactory.create(
+            produceFile = { context.preferencesDataStoreFile("settings") }
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun providePreferenceRepository(dataStore: DataStore<Preferences>): PreferenceRepository {
+        return PreferenceRepositoryImpl(dataStore)
     }
 }

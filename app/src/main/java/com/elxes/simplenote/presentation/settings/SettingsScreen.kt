@@ -6,13 +6,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.BrightnessMedium
-import androidx.compose.material.icons.filled.DeleteForever
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -66,6 +64,8 @@ fun SettingsScreen(
             onDismiss = { showThemeDialog = false }
         )
     }
+
+    val uriHandler = LocalUriHandler.current
 
     Scaffold(
         topBar = {
@@ -137,6 +137,24 @@ fun SettingsScreen(
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
             SettingsSectionTitle("About")
+
+            ListItem(
+                headlineContent = { Text("Creator") },
+                supportingContent = { Text("Elxes") },
+                leadingContent = { Icon(Icons.Default.Person, contentDescription = null) },
+                modifier = Modifier.clickable { 
+                    uriHandler.openUri("https://github.com/Elxes04")
+                }
+            )
+
+            ListItem(
+                headlineContent = { Text("GitHub Repository") },
+                supportingContent = { Text("Source code for SimpleNote") },
+                leadingContent = { Icon(Icons.Default.Code, contentDescription = null) },
+                modifier = Modifier.clickable { 
+                    uriHandler.openUri("https://github.com/Elxes04/SimpleNote")
+                }
+            )
 
             ListItem(
                 headlineContent = { Text("App Version") },

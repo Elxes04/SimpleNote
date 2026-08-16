@@ -20,7 +20,8 @@ I built this app to have a fast, clean place for Markdown notes. It follows mode
 - **Kotlin** 100%
 - **Jetpack Compose** (Material 3)
 - **Hilt** for Dependency Injection
-- **Room** for local persistence
+- **Room** for local note persistence
+- **DataStore** for persistent settings
 - **Flow** based state management
 
 ## Getting Started
