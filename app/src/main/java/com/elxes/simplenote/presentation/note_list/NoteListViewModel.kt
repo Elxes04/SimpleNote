@@ -61,6 +61,16 @@ class NoteListViewModel @Inject constructor(
         }
     }
 
+    fun getSelectedNotesText(): String {
+        val selectedIds = _selectedNoteIds.value
+        return notes.value
+            .filter { it.id in selectedIds }
+            .joinToString("\n\n---\n\n") { note ->
+                val title = if (note.title.isNotBlank()) "${note.title}\n\n" else ""
+                title + note.content
+            }
+    }
+
     fun deleteNote(note: Note) {
         viewModelScope.launch {
             repository.deleteNote(note)

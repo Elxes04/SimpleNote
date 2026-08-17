@@ -17,6 +17,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.halilibo.richtext.markdown.Markdown
+import com.halilibo.richtext.ui.material3.Material3RichText
 import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -181,7 +183,9 @@ fun PreviewContent(
             modifier = Modifier.fillMaxWidth()
         ) {
             Box(modifier = Modifier.padding(24.dp)) {
-                Text(text = content, style = MaterialTheme.typography.bodyLarge) 
+                Material3RichText {
+                    Markdown(content = content)
+                }
             }
         }
     }

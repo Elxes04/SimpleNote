@@ -6,6 +6,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -27,6 +28,7 @@ fun SettingsScreen(
     
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showThemeDialog by remember { mutableStateOf(false) }
+    var showLibrariesDialog by remember { mutableStateOf(false) }
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
@@ -63,6 +65,10 @@ fun SettingsScreen(
             },
             onDismiss = { showThemeDialog = false }
         )
+    }
+
+    if (showLibrariesDialog) {
+        LibrariesDialog(onDismiss = { showLibrariesDialog = false })
     }
 
     val uriHandler = LocalUriHandler.current
@@ -157,8 +163,15 @@ fun SettingsScreen(
             )
 
             ListItem(
+                headlineContent = { Text("Open Source Libraries") },
+                supportingContent = { Text("Credits for components used in the app") },
+                leadingContent = { Icon(Icons.AutoMirrored.Filled.MenuBook, contentDescription = null) },
+                modifier = Modifier.clickable { showLibrariesDialog = true }
+            )
+
+            ListItem(
                 headlineContent = { Text("App Version") },
-                supportingContent = { Text("1.0.1") },
+                supportingContent = { Text("1.0.2") },
                 leadingContent = { Icon(Icons.Default.Info, contentDescription = null) }
             )
         }
@@ -214,5 +227,41 @@ fun ThemeDialogOption(
         RadioButton(selected = selected, onClick = null)
         Spacer(modifier = Modifier.width(16.dp))
         Text(text = text, style = MaterialTheme.typography.bodyLarge)
+    }
+}
+
+@Composable
+fun LibrariesDialog(onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Open Source Libraries") },
+        text = {
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                LibraryItem("Jetpack Compose", "Apache 2.0")
+                LibraryItem("Dagger Hilt", "Apache 2.0")
+                LibraryItem("Room Database", "Apache 2.0")
+                LibraryItem("Jetpack DataStore", "Apache 2.0")
+                LibraryItem("Compose Richtext", "MIT")
+                LibraryItem("Commonmark", "BSD-2-Clause")
+                LibraryItem("Splashscreen API", "Apache 2.0")
+                LibraryItem("Material Components", "Apache 2.0")
+                LibraryItem("Kotlin Coroutines", "Apache 2.0")
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) { Text("Close") }
+        }
+    )
+}
+
+@Composable
+fun LibraryItem(name: String, license: String) {
+    Column(modifier = Modifier.padding(vertical = 8.dp)) {
+        Text(text = name, style = MaterialTheme.typography.titleSmall)
+        Text(
+            text = license,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }

@@ -12,11 +12,13 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -39,7 +41,34 @@ fun NoteListScreen(
     val selectedNoteIds by viewModel.selectedNoteIds.collectAsStateWithLifecycle()
     val isSelectionMode = selectedNoteIds.isNotEmpty()
     
+    var showDeleteConfirmDialog by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+
+    if (showDeleteConfirmDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteConfirmDialog = false },
+            title = { Text("Delete selected notes?") },
+            text = { Text("Are you sure you want to delete ${selectedNoteIds.size} notes? This action cannot be undone.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.deleteSelectedNotes()
+                        showDeleteConfirmDialog = false
+                    },
+                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                ) {
+                    Text("Delete")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteConfirmDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -53,7 +82,17 @@ fun NoteListScreen(
                         }
                     },
                     actions = {
-                        IconButton(onClick = viewModel::deleteSelectedNotes) {
+                        IconButton(onClick = {
+                            val text = viewModel.getSelectedNotesText()
+                            val intent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                                type = "text/plain"
+                                putExtra(android.content.Intent.EXTRA_TEXT, text)
+                            }
+                            context.startActivity(android.content.Intent.createChooser(intent, "Share notes"))
+                        }) {
+                            Icon(Icons.Default.Share, contentDescription = "Share selected")
+                        }
+                        IconButton(onClick = { showDeleteConfirmDialog = true }) {
                             Icon(Icons.Default.Delete, contentDescription = "Delete selected")
                         }
                     },
