@@ -13,3 +13,8 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Build artifacts
+app/build/
+app/release/
+.kotlin/
